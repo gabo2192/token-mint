@@ -1,25 +1,25 @@
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
-  Account,
+  Connection,
   PublicKey,
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
   TransactionInstruction,
-  Connection,
 } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import bs58 from 'bs58';
+import { assert } from 'console';
+
 import {
   createChangeDestinationInstruction,
   createCreateInstruction,
   createInitInstruction,
   createUnlockInstruction,
 } from './instructions';
-import {
-  findAssociatedTokenAddress,
-  createAssociatedTokenAccount,
-} from './utils';
 import { ContractInfo, Schedule } from './state';
-import { assert } from 'console';
-import bs58 from 'bs58';
+import {
+  createAssociatedTokenAccount,
+  findAssociatedTokenAddress,
+} from './utils';
 
 export const TOKEN_VESTING_PROGRAM_ID = new PublicKey(
   'CChTq6PthWU82YZkbveA3WDf7s97BWhBK4Vx9bmsT743',
@@ -66,7 +66,7 @@ export async function create(
   console.log('contract ID: ', bs58.encode(seedWord));
 
   const check_existing = await connection.getAccountInfo(vestingAccountKey);
-  if (!!check_existing) {
+  if (check_existing) {
     throw 'Contract already exists.';
   }
 
@@ -149,11 +149,11 @@ export async function getContractInfo(
   if (!vestingInfo) {
     throw 'Vesting contract account is unavailable';
   }
-  const info = ContractInfo.fromBuffer(vestingInfo!.data);
+  const info = ContractInfo.fromBuffer(vestingInfo.data);
   if (!info) {
     throw 'Vesting contract account is not initialized';
   }
-  return info!;
+  return info;
 }
 
 export async function changeDestination(
@@ -179,7 +179,7 @@ export async function changeDestination(
       'At least one of newDestinationTokenAccount and newDestinationTokenAccountOwner must be provided!',
     );
     newDestinationTokenAccount = await findAssociatedTokenAddress(
-      newDestinationTokenAccountOwner!,
+      newDestinationTokenAccountOwner,
       contractInfo.mintAddress,
     );
   }

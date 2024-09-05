@@ -3,8 +3,8 @@ import { Numberu64 } from './utils';
 
 export class Schedule {
   // Release time in unix timestamp
-  releaseTime!: Numberu64;
-  amount!: Numberu64;
+  releaseTime: Numberu64;
+  amount: Numberu64;
 
   constructor(releaseTime: Numberu64, amount: Numberu64) {
     this.releaseTime = releaseTime;

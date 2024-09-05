@@ -1,20 +1,17 @@
-// @ts-nocheck
-import BN from 'bn.js';
-import assert from 'assert';
-import nacl from 'tweetnacl';
-import * as bip32 from 'bip32';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
-  Keypair,
   Account,
   Connection,
+  Keypair,
+  PublicKey,
+  SYSVAR_RENT_PUBKEY,
   Transaction,
   TransactionInstruction,
-  PublicKey,
-  TransactionInstruction,
-  SYSVAR_RENT_PUBKEY,
 } from '@solana/web3.js';
-import { Schedule } from './state';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import assert from 'assert';
+import * as bip32 from 'bip32';
+import BN from 'bn.js';
+import nacl from 'tweetnacl';
 
 export async function findAssociatedTokenAddress(
   walletAddress: PublicKey,

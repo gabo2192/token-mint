@@ -1,12 +1,8 @@
-import { Connection, PublicKey, Keypair } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import fs from 'fs';
-import {
-  Numberu64,
-  generateRandomSeed,
-  signTransactionInstructions,
-} from './utils';
-import { Schedule } from './state';
 import { create, TOKEN_VESTING_PROGRAM_ID } from './main';
+import { Schedule } from './state';
+import { generateRandomSeed, signTransactionInstructions } from './utils';
 
 /**
  *
@@ -17,9 +13,19 @@ import { create, TOKEN_VESTING_PROGRAM_ID } from './main';
  */
 
 /** Path to your wallet */
-const WALLET_PATH = '';
+const WALLET_PATH = '~/.config/solana/id.json';
+const DESTINATION_PATH = '../../id_dest.json';
+const NEW_DESTINATION_PATH = '../../id_dest_new.json';
 const wallet = Keypair.fromSecretKey(
   new Uint8Array(JSON.parse(fs.readFileSync(WALLET_PATH).toString())),
+);
+
+const destinationWallet = Keypair.fromSecretKey(
+  new Uint8Array(JSON.parse(fs.readFileSync(DESTINATION_PATH).toString())),
+);
+
+const newDestinationWallet = Keypair.fromSecretKey(
+  new Uint8Array(JSON.parse(fs.readFileSync(NEW_DESTINATION_PATH).toString())),
 );
 
 /** There are better way to generate an array of dates but be careful as it's irreversible */
@@ -50,6 +56,7 @@ const DATES = [
   new Date(2024, 12),
 ];
 
+console.log(destinationWallet.publicKey.toBase58());
 /** Info about the desintation */
 const DESTINATION_OWNER = new PublicKey('');
 const DESTINATION_TOKEN_ACCOUNT = new PublicKey('');
@@ -90,16 +97,16 @@ const checks = async () => {
 const lock = async () => {
   await checks();
   const schedules: Schedule[] = [];
-  for (let date of DATES) {
-    schedules.push(
-      new Schedule(
-        /** Has to be in seconds */
-        new Numberu64(date.getTime() / 1_000),
-        /** Don't forget to add decimals */
-        new Numberu64(AMOUNT_PER_SCHEDULE * Math.pow(10, DECIMALS)),
-      ),
-    );
-  }
+  // for (let date of DATES) {
+  //   schedules.push(
+  //     new Schedule(
+  //       /** Has to be in seconds */
+  //       new Numberu64(date.getTime() / 1_000),
+  //       /** Don't forget to add decimals */
+  //       new Numberu64(AMOUNT_PER_SCHEDULE * Math.pow(10, DECIMALS)),
+  //     ),
+  //   );
+  // }
   const seed = generateRandomSeed();
 
   console.log(`Seed: ${seed}`);
