@@ -4,7 +4,7 @@ use solana_program::{
     instruction::{AccountMeta, Instruction},
     msg,
     program_error::ProgramError,
-    pubkey::Pubkey
+    pubkey::Pubkey,
 };
 
 use std::convert::TryInto;
@@ -118,6 +118,8 @@ impl VestingInstruction {
     pub fn unpack(input: &[u8]) -> Result<Self, ProgramError> {
         use VestingError::InvalidInstruction;
         let (&tag, rest) = input.split_first().ok_or(InvalidInstruction)?;
+        msg!("tag: {}", tag);
+        msg!("rest: {:?}", rest);
         Ok(match tag {
             0 => {
                 let seeds: [u8; 32] = rest

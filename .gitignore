@@ -13,3 +13,5 @@ cli/target/.rustc_info.json
 js/dist
 test-ledger
 **/node_modules
+**/.next
+.turbo

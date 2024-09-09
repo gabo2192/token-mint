@@ -29,7 +29,7 @@ impl Processor {
         program_id: &Pubkey,
         accounts: &[AccountInfo],
         seeds: [u8; 32],
-        schedules: u32
+        schedules: u32,
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
 
@@ -135,7 +135,7 @@ impl Processor {
 
         let mut data = vesting_account.data.borrow_mut();
         if data.len() != VestingScheduleHeader::LEN + schedules.len() * VestingSchedule::LEN {
-            return Err(ProgramError::InvalidAccountData)
+            return Err(ProgramError::InvalidAccountData);
         }
         state_header.pack_into_slice(&mut data);
 
@@ -155,10 +155,10 @@ impl Processor {
             }
             offset += SCHEDULE_SIZE;
         }
-        
+
         if Account::unpack(&source_token_account.data.borrow())?.amount < total_amount {
             msg!("The source token account has insufficient funds.");
-            return Err(ProgramError::InsufficientFunds)
+            return Err(ProgramError::InsufficientFunds);
         };
 
         let transfer_tokens_to_vesting_account = transfer(
@@ -203,7 +203,7 @@ impl Processor {
 
         if spl_token_account.key != &spl_token::id() {
             msg!("The provided spl token program account is invalid");
-            return Err(ProgramError::InvalidArgument)
+            return Err(ProgramError::InvalidArgument);
         }
 
         let packed_state = &vesting_account.data;
@@ -280,7 +280,7 @@ impl Processor {
         let new_destination_token_account = next_account_info(accounts_iter)?;
 
         if vesting_account.data.borrow().len() < VestingScheduleHeader::LEN {
-            return Err(ProgramError::InvalidAccountData)
+            return Err(ProgramError::InvalidAccountData);
         }
         let vesting_account_key = Pubkey::create_program_address(&[&seeds], program_id)?;
         let state = VestingScheduleHeader::unpack(
@@ -323,6 +323,7 @@ impl Processor {
         instruction_data: &[u8],
     ) -> ProgramResult {
         msg!("Beginning processing");
+        msg!("Instruction data: {:?}", instruction_data);
         let instruction = VestingInstruction::unpack(instruction_data)?;
         msg!("Instruction unpacked");
         match instruction {

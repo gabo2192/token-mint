@@ -1,4 +1,7 @@
+import Header from "@/components/header";
 import { cn } from "@/lib/utils";
+import WalletConnectionProvider from "@/providers/wallet-connection";
+import "@solana/wallet-adapter-react-ui/styles.css";
 import { Inter as FontSans, PT_Serif } from "next/font/google";
 import "./globals.css";
 
@@ -26,7 +29,14 @@ export default function RootLayout({
           fontSans.variable,
           fontSerif.variable
         )}
-      ></body>
+      >
+        <WalletConnectionProvider>
+          <>
+            <Header />
+            {children}
+          </>
+        </WalletConnectionProvider>
+      </body>
     </html>
   );
 }
