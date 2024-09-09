@@ -12,7 +12,7 @@ export default function Header() {
   return (
     <div className="flex justify-between items-center py-4 px-8 bg-gray-800 text-white">
       <div>
-        <h1 className="text-2xl font-bold">Solana Mint</h1>
+        <h1 className="text-2xl font-bold">Neptune Mint</h1>
       </div>
       <div>
         <WalletMultiButton />
