@@ -1,10 +1,23 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useMintContext } from "@/hooks/use-mint-context";
 import { TOKEN_VESTING_PROGRAM_ID, unlock } from "@/lib/actions";
 import { findAssociatedTokenAddress } from "@/lib/solana-utils";
 import { ContractInfo } from "@/lib/state";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction } from "@solana/web3.js";
+import { format } from "date-fns";
+import { isBefore } from "date-fns/isBefore";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -57,6 +70,7 @@ export default function Page({ params: { slug } }: Props) {
     };
     fetchAccount();
   }, [publicKey]);
+  const { mint } = useMintContext();
 
   const handleClaim = async () => {
     console.log("claim");
@@ -91,20 +105,45 @@ export default function Page({ params: { slug } }: Props) {
   }
 
   return (
-    <main className="max-w-lg mx-auto px-3 space-y-2">
+    <main className="max-w-lg mx-auto px-3 space-y-2 prose mt-10">
       <h1>Vesting contract</h1>
-      <p>Contract Balance: {balance}</p>
-      <button onClick={handleClaim}>Claim Tokens</button>
+      <div className="flex flex-row justify-between items-center">
+        <h4>Contract Balance: {balance}</h4>
+        <Button onClick={handleClaim}>Claim Tokens</Button>
+      </div>
       <h3>Schedule:</h3>
-      {info?.schedules.map((schedule, i) => (
-        <div key={i} className="flex gap-4 items-start">
-          <span>
-            Release Time:{" "}
-            {new Date(schedule.releaseTime.toNumber() * 1000).toLocaleString()}
-          </span>
-          <span>{schedule.amount.toNumber() / 10 ** 9} Tokens</span>
-        </div>
-      ))}
+      <Table>
+        <TableCaption>A list of your schedule.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Release Time</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {info?.schedules.map((schedule, i) => {
+            let status =
+              schedule.amount.toNumber() === 0 ? "Claimed" : "Pending";
+            const releaseDate = format(
+              schedule.releaseTime.toNumber() * 1000,
+              "yyyy-MM-dd"
+            );
+            if (status === "Pending" && isBefore(releaseDate, new Date())) {
+              status = "Available";
+            }
+            return (
+              <TableRow>
+                <TableCell className="font-medium">{releaseDate}</TableCell>
+                <TableCell>{status}</TableCell>
+                <TableCell className="text-right">
+                  {schedule.amount.toNumber() / 10 ** (mint?.decimals || 9)}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </main>
   );
 }

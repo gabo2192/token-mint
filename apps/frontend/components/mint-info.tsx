@@ -1,15 +1,14 @@
 "use client";
+import { useMintContext } from "@/hooks/use-mint-context";
 import {
   createAssociatedTokenAccountInstruction,
   createMintToInstruction,
-  getAssociatedTokenAddress,
-  getMint,
-  Mint,
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Button } from "./ui/button";
 
 interface Props {
   mintKey: string;
@@ -18,33 +17,8 @@ interface Props {
 export default function MintInfo({ mintKey }: Props) {
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useWallet();
-  const [mint, setMint] = useState<Mint | null>(null);
-  const [account, setAccount] = useState<PublicKey | null>(null);
   const [amount, setAmount] = useState(0);
-  const [balance, setBalance] = useState(0);
-
-  useEffect(() => {
-    if (!mintKey || !publicKey) {
-      return;
-    }
-    (async () => {
-      try {
-        const mint = await getMint(connection, new PublicKey(mintKey));
-        setMint(mint);
-        const account = await getAssociatedTokenAddress(
-          new PublicKey(mintKey),
-          publicKey
-        );
-        setAccount(account);
-        const balance = await connection.getTokenAccountBalance(account);
-        if (balance) {
-          setBalance(balance.value.uiAmount!);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    })();
-  }, [mintKey, publicKey]);
+  const { account, mint, balance } = useMintContext();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -106,12 +80,14 @@ export default function MintInfo({ mintKey }: Props) {
               onChange={(e) => setAmount(Number(e.target.value))}
             />
           </div>
-          <button disabled={amount === 0} type="submit">
+          <Button disabled={amount === 0} type="submit">
             Mint
-          </button>
+          </Button>
         </form>
       )}
-      <Link href={"/mint/" + mintKey + "/vesting"}>Distribute Tokens</Link>
+      <Button asChild variant={"secondary"}>
+        <Link href={"/mint/" + mintKey + "/vesting"}>Distribute Tokens</Link>
+      </Button>
     </div>
   );
 }

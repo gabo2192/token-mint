@@ -7,6 +7,7 @@ import {
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
 import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 
 export default function CreateMint() {
   const { connection } = useConnection();
@@ -57,51 +58,10 @@ export default function CreateMint() {
     }
   };
 
-  // const handleAssociatedAccounts = async () => {
-  //   try {
-  //     console.log("Associated Accounts");
-  //     if (!publicKey || !wallet || !signTransaction) {
-  //       return;
-  //     }
-  //     const mint = new PublicKey(
-  //       "ESbnEDk77baP4u8s63CJBuRuwZ76Hw747W2g6iqM2RXb"
-  //     );
-  //     const ata = await getAssociatedTokenAddress(mint, publicKey);
-  //     console.log(ata.toBase58());
-  //     const account = await connection.getAccountInfo(ata);
-  //     if (account !== null) {
-  //       console.log("Account exists");
-  //       return;
-  //     }
-  //     const transaction = new Transaction();
-  //     transaction.add(
-  //       createAssociatedTokenAccountInstruction(
-  //         publicKey, // payer
-  //         ata, // ata
-  //         publicKey, // owner
-  //         mint // mint
-  //       )
-  //     );
-  //     const { blockhash } = await connection.getLatestBlockhash();
-  //     // console.log({ blockhash });
-  //     // transaction.recentBlockhash = blockhash;
-  //     transaction.feePayer = publicKey;
-
-  //     const tx = await signTransaction(transaction);
-
-  //     const txid = await connection.sendRawTransaction(tx.serialize(), {
-  //       maxRetries: 5,
-  //     });
-  //     console.log(txid);
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
-
   return (
     <>
       <div className="mt-10">
-        <button onClick={handleMint}>Create Mint</button>
+        <Button onClick={handleMint}>Create Mint</Button>
       </div>
     </>
   );

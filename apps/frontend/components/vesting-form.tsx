@@ -1,17 +1,17 @@
 "use client";
+import { useMintContext } from "@/hooks/use-mint-context";
 import { create, TOKEN_VESTING_PROGRAM_ID } from "@/lib/actions";
 import { Numberu64 } from "@/lib/solana-utils";
 import { Schedule } from "@/lib/state";
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
-  getMint,
-  Mint,
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { format } from "date-fns/format";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Button } from "./ui/button";
 
 interface Props {
   mintKey: string;
@@ -24,36 +24,11 @@ interface LocalSchedule {
 export default function VestingForm({ mintKey }: Props) {
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useWallet();
-  const [mint, setMint] = useState<Mint | null>(null);
-  const [account, setAccount] = useState<PublicKey | null>(null);
   const [amount, setAmount] = useState(0);
   const [date, setDate] = useState<string>("");
   const [destinationPubkey, setDestinationPubkey] = useState("");
-  const [balance, setBalance] = useState(0);
   const [schedules, setSchedules] = useState<LocalSchedule[]>([]);
-
-  useEffect(() => {
-    if (!mintKey || !publicKey) {
-      return;
-    }
-    (async () => {
-      try {
-        const mint = await getMint(connection, new PublicKey(mintKey));
-        setMint(mint);
-        const account = await getAssociatedTokenAddress(
-          new PublicKey(mintKey),
-          publicKey
-        );
-        setAccount(account);
-        const balance = await connection.getTokenAccountBalance(account);
-        if (balance) {
-          setBalance(balance.value.uiAmount!);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    })();
-  }, [mintKey, publicKey]);
+  const { account, balance, mint } = useMintContext();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -199,13 +174,13 @@ export default function VestingForm({ mintKey }: Props) {
               />
             </div>
           </div>
-          <button type="button" onClick={handleSchedule}>
+          <Button variant={"secondary"} type="button" onClick={handleSchedule}>
             Add Schedule
-          </button>
+          </Button>
 
-          <button disabled={schedules.length === 0} type="submit">
+          <Button disabled={schedules.length === 0} type="submit">
             Vest Tokens
-          </button>
+          </Button>
         </form>
       )}
     </div>
