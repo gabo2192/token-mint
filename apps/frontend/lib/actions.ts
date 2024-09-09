@@ -7,12 +7,16 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import bs58 from "bs58";
-import { createCreateInstruction, createInitInstruction } from "./instructions";
+import {
+  createCreateInstruction,
+  createInitInstruction,
+  createUnlockInstruction,
+} from "./instructions";
 import {
   createAssociatedTokenAccount,
   findAssociatedTokenAddress,
 } from "./solana-utils";
-import { Schedule } from "./state";
+import { ContractInfo, Schedule } from "./state";
 
 export const TOKEN_VESTING_PROGRAM_ID = new PublicKey(
   "52wZo8k2yKJx8aKdcGfD4vdfBr4i7KBH7K3z178EQ3PF"
@@ -96,4 +100,58 @@ export async function create(
     ),
   ];
   return instruction;
+}
+
+export async function unlock(
+  connection: Connection,
+  programId: PublicKey,
+  seedWord: Buffer | Uint8Array,
+  mintAddress: PublicKey
+): Promise<Array<TransactionInstruction>> {
+  seedWord = seedWord.slice(0, 31);
+  const [vestingAccountKey, bump] = await PublicKey.findProgramAddress(
+    [seedWord],
+    programId
+  );
+  seedWord = Buffer.from(seedWord.toString("hex") + bump.toString(16), "hex");
+
+  const vestingTokenAccountKey = await findAssociatedTokenAddress(
+    vestingAccountKey,
+    mintAddress
+  );
+
+  const vestingInfo = await getContractInfo(connection, vestingAccountKey);
+
+  let instruction = [
+    createUnlockInstruction(
+      programId,
+      TOKEN_PROGRAM_ID,
+      SYSVAR_CLOCK_PUBKEY,
+      vestingAccountKey,
+      vestingTokenAccountKey,
+      vestingInfo.destinationAddress,
+      [seedWord]
+    ),
+  ];
+
+  return instruction;
+}
+
+export async function getContractInfo(
+  connection: Connection,
+  vestingAccountKey: PublicKey
+): Promise<ContractInfo> {
+  console.log("Fetching contract ", vestingAccountKey.toBase58());
+  const vestingInfo = await connection.getAccountInfo(
+    vestingAccountKey,
+    "single"
+  );
+  if (!vestingInfo) {
+    throw "Vesting contract account is unavailable";
+  }
+  const info = ContractInfo.fromBuffer(vestingInfo.data);
+  if (!info) {
+    throw "Vesting contract account is not initialized";
+  }
+  return info;
 }
