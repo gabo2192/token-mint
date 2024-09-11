@@ -18,6 +18,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { format } from "date-fns";
 import { isBefore } from "date-fns/isBefore";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -32,6 +33,7 @@ export default function Page({ params: { slug } }: Props) {
   const { publicKey, signTransaction } = useWallet();
   const [info, setInfo] = useState<ContractInfo | null>(null);
   const [balance, setBalance] = useState(0);
+  const router = useRouter();
   useEffect(() => {
     const fetchAccount = async () => {
       if (!publicKey) return;
@@ -91,11 +93,20 @@ export default function Page({ params: { slug } }: Props) {
         signedTx.serialize()
       );
       console.log("Signature", signature);
+      router.refresh();
     } catch (e: any) {
+      console.log(e);
       if (
         e.message.includes("Vesting contract has not yet reached release time")
       ) {
         alert("Vesting contract has not yet reached release time");
+      }
+      if (
+        e.message.includes(
+          "Attempt to debit an account but found no record of a prior credit"
+        )
+      ) {
+        alert("You need SOL to claim tokens");
       }
     }
   };

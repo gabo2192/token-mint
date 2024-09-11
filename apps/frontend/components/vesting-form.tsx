@@ -9,7 +9,6 @@ import {
 } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction } from "@solana/web3.js";
-import { format } from "date-fns/format";
 import { useState } from "react";
 import { Button } from "./ui/button";
 
@@ -156,9 +155,7 @@ export default function VestingForm({ mintKey }: Props) {
                 type="date"
                 name="date"
                 onChange={(e) => {
-                  const date = new Date(e.target.value);
-                  const formattedDate = format(date, "yyyy-MM-dd");
-                  setDate(formattedDate);
+                  setDate(e.target.value);
                 }}
                 value={date}
                 id="date"
