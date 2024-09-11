@@ -15,3 +15,4 @@ test-ledger
 **/node_modules
 **/.next
 .turbo
+**/.env

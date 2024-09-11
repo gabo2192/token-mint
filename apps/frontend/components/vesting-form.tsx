@@ -105,6 +105,9 @@ export default function VestingForm({ mintKey }: Props) {
     }
   };
   const handleSchedule = () => {
+    if (!date || amount === 0) {
+      return;
+    }
     const newSchedule: LocalSchedule = {
       releaseTime: new Date(date).getTime(),
       amount: amount,

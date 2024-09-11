@@ -1,3 +1,4 @@
+import { TOKEN_VESTING_PROGRAM_ID as TOKEN_VESTING_PROGRAM_ID_STR } from "@/config";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
   Connection,
@@ -19,7 +20,7 @@ import {
 import { ContractInfo, Schedule } from "./state";
 
 export const TOKEN_VESTING_PROGRAM_ID = new PublicKey(
-  "52wZo8k2yKJx8aKdcGfD4vdfBr4i7KBH7K3z178EQ3PF"
+  TOKEN_VESTING_PROGRAM_ID_STR
 );
 
 export async function create(

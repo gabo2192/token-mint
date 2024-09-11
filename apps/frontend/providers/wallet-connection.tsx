@@ -1,4 +1,5 @@
 "use client";
+import { NETWORK_CONNECTION_ENDPOINT } from "@/config";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -25,7 +26,7 @@ const WalletConnectionProvider = ({ children }: Props) => {
     []
   );
   return (
-    <ConnectionProvider endpoint="https://api.devnet.solana.com ">
+    <ConnectionProvider endpoint={NETWORK_CONNECTION_ENDPOINT}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>

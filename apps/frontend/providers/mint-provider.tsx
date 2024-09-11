@@ -42,6 +42,7 @@ export const MintProvider = ({ children }: Props) => {
           new PublicKey(mintKey),
           publicKey
         );
+
         setAccount(account);
         const balance = await connection.getTokenAccountBalance(account);
         if (balance) {
