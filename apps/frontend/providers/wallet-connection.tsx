@@ -5,7 +5,10 @@ import {
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
+import {
+  PhantomWalletAdapter,
+  SolflareWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
 import { useMemo } from "react";
 
 interface Props {
@@ -16,7 +19,7 @@ const WalletConnectionProvider = ({ children }: Props) => {
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
-      //   new SolflareWalletAdapter(),
+      new SolflareWalletAdapter(),
       //   // new TorusWalletAdapter(),
       //   new LedgerWalletAdapter(),
       //   // new Coin98WalletAdapter(),
