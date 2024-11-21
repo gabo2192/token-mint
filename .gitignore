@@ -16,3 +16,4 @@ test-ledger
 **/.next
 .turbo
 **/.env
+.vercel
