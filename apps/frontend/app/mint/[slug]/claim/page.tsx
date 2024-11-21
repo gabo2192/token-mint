@@ -32,6 +32,7 @@ export default function Page({ params: { slug } }: Props) {
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useWallet();
   const [info, setInfo] = useState<ContractInfo | null>(null);
+  const [reload, setReload] = useState(false);
   const [balance, setBalance] = useState(0);
   const router = useRouter();
   useEffect(() => {
@@ -69,9 +70,10 @@ export default function Page({ params: { slug } }: Props) {
       if (tokenBalance && tokenBalance.value.uiAmount) {
         setBalance(tokenBalance.value.uiAmount);
       }
+      setReload(false);
     };
     fetchAccount();
-  }, [publicKey]);
+  }, [publicKey, reload]);
   const { mint } = useMintContext();
 
   const handleClaim = async () => {
@@ -93,6 +95,7 @@ export default function Page({ params: { slug } }: Props) {
         signedTx.serialize()
       );
       console.log("Signature", signature);
+      setReload(true);
       router.refresh();
     } catch (e: any) {
       console.log(e);
